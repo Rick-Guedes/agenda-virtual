@@ -1,0 +1,430 @@
+/** 
+ Autor: Flavio Henrique Guedes Nobre;
+ Version: 1.0.1
+ "Você é livre para usar e modificar com sabedoria esse código ele é aberto, só não deixe de 
+ dar os créditos ao autor"
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #292B65;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    height: 100%;
+}
+
+/* Centraliza verticalmente apenas em desktops */
+@media (min-width: 769px) {
+    body {
+        align-items: center;
+    }
+}
+
+/* Container do calendário */
+.calendar-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* Estilo do calendário */
+.calendar {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.header button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.header button:hover {
+    background-color: #0056b3;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.day {
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fafafa;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-sizing: border-box;
+}
+
+.day:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.day.empty {
+    background-color: transparent;
+    border: none;
+    cursor: default;
+}
+
+.event {
+    margin-top: 5px;
+    font-size: 11px;
+    color: #555;
+    background-color: #e0e0e0;
+    padding: 4px;
+    border-radius: 4px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    word-wrap: break-word;
+    cursor: pointer;
+}
+
+.event:hover {
+    background-color: #d0d0d0;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 15px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+    box-sizing: border-box;
+}
+
+.close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 20px;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.event-list {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.event-detail {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #555;
+}
+
+.event-detail:last-child {
+    border-bottom: none;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+#saveEvent {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#saveEvent:hover {
+    background-color: #45a049;
+}
+
+.modal-content .form-group {
+    margin-bottom: 10px;
+}
+
+.modal-content .form-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.modal-content .form-row .form-group {
+    flex: 1;
+    min-width: 120px;
+}
+
+.modal-content textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-content select {
+    appearance: none;
+    background-color: white;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 10px;
+}
+
+.auth-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.auth-button:hover {
+    background-color: #0056b3;
+}
+
+.export-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.export-button:hover {
+    background-color: #218838;
+}
+
+/* Estilo do modal de eventos detalhados no SweetAlert2 */
+.swal2-popup.event-list-modal {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.swal2-title.event-list-title {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.swal2-content.event-list-content {
+    font-size: 14px;
+    color: #555;
+}
+
+.swal2-content.event-list-content .event-detail {
+    padding: 8px 0;
+    color: #333;
+}
+
+.swal2-content.event-list-content hr {
+    border: 1px solid #e0e0e0;
+    margin: 5px 0;
+    height: 1px; /* Garantir que a linha seja fina */
+    background: none; /* Remover qualquer fundo que possa duplicar*/
+}
+
+/* Estilo do botão OK */
+.swal2-confirm-ok {
+    background-color: #6c757d; /* Cor roxa/clara como na imagem */
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.swal2-confirm-ok:hover {
+    background-color: #5a6268; /* Escurece ao passar o mouse */
+}
+
+/* Estilo do pop-up inicial com SweetAlert2 */
+.swal2-popup.custom-popup {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.swal2-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.swal2-confirm {
+    background-color: #4CAF50;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.swal2-confirm:hover {
+    background-color: #45a049;
+}
+
+/* Media Queries para responsividade */
+@media (max-width: 768px) {
+    .calendar {
+        padding: 10px;
+    }
+
+    .header h2 {
+        font-size: 18px;
+    }
+
+    .header button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .days {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+
+    .day {
+        padding: 8px;
+        min-height: 50px;
+        font-size: 12px;
+    }
+
+    .event {
+        font-size: 10px;
+        padding: 3px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .days {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+    }
+
+    .day {
+        padding: 6px;
+        min-height: 40px;
+        font-size: 11px;
+    }
+
+    .event {
+        font-size: 9px;
+        padding: 2px;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 2% auto;
+    }
+
+    .modal-content input,
+    .modal-content textarea,
+    .modal-content select {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    #saveEvent {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
