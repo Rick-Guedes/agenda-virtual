@@ -1,0 +1,409 @@
+<!-- 
+ Autor: Flavio Henrique Guedes Nobre;
+ Version: 1.0.1
+ "Você é livre para usar e modificar com sabedoria esse código ele é aberto, só não deixe de 
+ dar os créditos ao autor"
+-->
+ 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Dinâmico</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+    <!-- Container do calendário -->
+    <div class="calendar-container">
+        <div class="calendar">
+            <div class="header">
+                <button id="prevMonth"><</button>
+                <h2 id="currentMonth"></h2>
+                <button id="nextMonth">></button>
+            </div>
+            <div class="days" id="days"></div>
+        </div>
+    </div>
+
+    <!-- Botão de exportação no canto inferior direito -->
+    <button id="exportEvents">Exportar Eventos para Excel</button>
+
+    <!-- Modal para adicionar eventos -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Adicionar Evento</h2>
+
+            <div class="form-group">
+                <label for="eventTitle">Título do Evento</label>
+                <input type="text" id="eventTitle" placeholder="Título do Evento">
+            </div>
+
+            <div class="form-group">
+                <label for="eventTime">Horário</label>
+                <input type="time" id="eventTime">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="eventEmail">E-mail</label>
+                    <input type="email" id="eventEmail" placeholder="E-mail">
+                </div>
+                <div class="form-group">
+                    <label for="eventPhone">Telefone/Whatsapp</label>
+                    <input type="text" id="eventPhone" placeholder="Telefone/Whatsapp">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="eventContact">Dados de Contato</label>
+                <textarea id="eventContact" placeholder="Dados de Contato"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="eventName">Nome Completo</label>
+                <input type="text" id="eventName" placeholder="Nome Completo">
+            </div>
+
+            <div class="form-group">
+                <label for="eventPublic">A reserva será para:</label>
+                <select id="eventPublic">
+                    <option value="Público interno">Público interno</option>
+                    <option value="Público Externo">Público Externo</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventRole">Você é:</label>
+                <select id="eventRole">
+                    <option value="Aluno">Aluno</option>
+                    <option value="Colaborador">Colaborador</option>
+                    <option value="Coordenador">Coordenador</option>
+                    <option value="Professor">Professor</option>
+                    <option value="Tutor">Tutor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventCourse">Curso:</label>
+                <select id="eventCourse">
+                    <option value="Administração">Administração</option>
+                    <option value="Agronomia">Agronomia</option>
+                    <option value="Biomedicina">Biomedicina</option>
+                    <option value="Ciências Contábeis">Ciências Contábeis</option>
+                    <option value="Direito">Direito</option>
+                    <option value="Educação Física">Educação Física</option>
+                    <option value="Enfermagem">Enfermagem</option>
+                    <option value="Estética e Cosmética">Estética e Cosmética</option>
+                    <option value="Farmácia">Farmácia</option>
+                    <option value="Fisioterapia">Fisioterapia</option>
+                    <option value="Fonoaudiologia">Fonoaudiologia</option>
+                    <option value="Medicina">Medicina</option>
+                    <option value="Medicina Veterinária">Medicina Veterinária</option>
+                    <option value="Nutrição">Nutrição</option>
+                    <option value="Odontologia">Odontologia</option>
+                    <option value="Pedagogia">Pedagogia</option>
+                    <option value="Psicologia">Psicologia</option>
+                    <option value="Terapia Ocupacional">Terapia Ocupacional</option>
+                    <option value="Zootecnia">Zootecnia</option>
+                    <option value="Não se aplica">Não se aplica</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventStudio">Estúdio:</label>
+                <select id="eventStudio">
+                    <option value="CromaKey">CromaKey (Estúdio de fundo verde - até 2 pessoas)</option>
+                    <option value="PodCast">PodCast (Estúdio com mesacast - até 4 pessoas)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventDuration">Duração:</label>
+                <select id="eventDuration">
+                    <option value="até 30 minutos">até 30 minutos</option>
+                    <option value="de 40 a 60 minutos">de 40 a 60 minutos</option>
+                    <option value="mais de 60 minutos">mais de 60 minutos</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventPeople">Quantidade de Pessoas:</label>
+                <select id="eventPeople">
+                    <option value="1 pessoa">1 pessoa</option>
+                    <option value="2 pessoas">2 pessoas</option>
+                    <option value="3 pessoas">3 pessoas</option>
+                    <option value="4 pessoas">4 pessoas</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventEdit">Necessita edição?</label>
+                <select id="eventEdit">
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="eventDelivery">A entrega da edição:</label>
+                <select id="eventDelivery">
+                    <option value="Retirada do arquivo">Retirada do arquivo</option>
+                    <option value="Upload no YouTube">Upload no YouTube</option>
+                </select>
+            </div>
+
+            <button id="saveEvent">Salvar</button>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar eventos -->
+    <div id="viewEventModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Eventos do Dia</h2>
+            <div id="eventList"></div>
+        </div>
+    </div>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Exibir pop-up com a imagem ao carregar a página
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                imageUrl: 'imagens/reserva_estudios.png',
+                imageAlt: 'Reserva de Estúdios',
+                showConfirmButton: true,
+                confirmButtonText: 'Entendi',
+                confirmButtonColor: '#4CAF50',
+                customClass: {
+                    popup: 'custom-popup',
+                },
+            });
+        });
+
+        let currentDate = new Date();
+        let selectedDay = null;
+
+        // Função para renderizar o calendário
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+
+            document.getElementById('currentMonth').textContent = 
+                `${firstDay.toLocaleString('default', { month: 'long' })} ${year}`;
+
+            const daysContainer = document.getElementById('days');
+            daysContainer.innerHTML = '';
+
+            for (let i = 0; i < startingDay; i++) {
+                daysContainer.innerHTML += `<div class="day empty"></div>`;
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = new Date(year, month, i);
+                const dayKey = day.toISOString().split('T')[0];
+
+                fetch(`listar-eventos.php?data=${dayKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'day';
+                        dayElement.setAttribute('data-date', dayKey);
+                        dayElement.innerHTML = `${i}${data.length > 0 ? `<div class="event" data-date="${dayKey}">Eventos agendados</div>` : ''}`;
+
+                        dayElement.addEventListener('click', () => {
+                            selectedDay = dayKey;
+                            document.getElementById('eventModal').style.display = 'block';
+                        });
+
+                        if (data.length > 0) {
+                            const eventElement = dayElement.querySelector('.event');
+                            eventElement.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                showEventsForDay(dayKey);
+                            });
+                        }
+
+                        daysContainer.appendChild(dayElement);
+                    })
+                    .catch(error => console.error('Erro ao carregar eventos:', error));
+            }
+        }
+
+        // Função para exibir eventos do dia
+        function showEventsForDay(dayKey) {
+            fetch(`listar-eventos.php?data=${dayKey}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição. Status: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const eventListContainer = document.getElementById('eventList');
+                    eventListContainer.innerHTML = '';
+
+                    if (data.length === 0) {
+                        eventListContainer.innerHTML = '<p>Nenhum evento cadastrado para este dia.</p>';
+                    } else {
+                        data.forEach(event => {
+                            eventListContainer.innerHTML += `
+                                <div class="event-detail">
+                                    <strong>${event.titulo}</strong> - ${event.horario}
+                                </div>
+                            `;
+                        });
+                    }
+
+                    document.getElementById('viewEventModal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar eventos:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Erro ao carregar eventos. Verifique o console para mais detalhes.',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'OK',
+                    });
+                });
+        }
+
+        // Salvar evento
+        document.getElementById('saveEvent').addEventListener('click', function () {
+            const titulo = document.getElementById('eventTitle').value;
+            const horario = document.getElementById('eventTime').value;
+            const email = document.getElementById('eventEmail').value;
+            const dadosContato = document.getElementById('eventContact').value;
+            const nomeCompleto = document.getElementById('eventName').value;
+            const telefoneWhatsapp = document.getElementById('eventPhone').value;
+            const publicoReserva = document.getElementById('eventPublic').value;
+            const cargo = document.getElementById('eventRole').value;
+            const curso = document.getElementById('eventCourse').value;
+            const estúdio = document.getElementById('eventStudio').value;
+            const duracao = document.getElementById('eventDuration').value;
+            const quantidadePessoas = document.getElementById('eventPeople').value;
+            const necessitaEdicao = document.getElementById('eventEdit').value;
+            const entregaEdicao = document.getElementById('eventDelivery').value;
+
+            if (!titulo || !horario || !selectedDay) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    text: 'Por favor, preencha todos os campos.',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK',
+                });
+                return;
+            }
+
+            fetch('salvar-evento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data: selectedDay,
+                    titulo,
+                    horario,
+                    email,
+                    dados_contato: dadosContato,
+                    nome_completo: nomeCompleto,
+                    telefone_whatsapp: telefoneWhatsapp,
+                    publico_reserva: publicoReserva,
+                    cargo,
+                    curso,
+                    estúdio,
+                    duracao,
+                    quantidade_pessoas: quantidadePessoas,
+                    necessita_edicao: necessitaEdicao,
+                    entrega_edicao: entregaEdicao
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: data.error,
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'OK',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: 'Evento salvo com sucesso!',
+                        confirmButtonColor: '#4CAF50',
+                        confirmButtonText: 'OK',
+                    });
+                    document.getElementById('eventTitle').value = '';
+                    document.getElementById('eventTime').value = '';
+                    document.getElementById('eventEmail').value = '';
+                    document.getElementById('eventContact').value = '';
+                    document.getElementById('eventName').value = '';
+                    document.getElementById('eventPhone').value = '';
+                    document.getElementById('eventPublic').value = '';
+                    document.getElementById('eventRole').value = '';
+                    document.getElementById('eventCourse').value = '';
+                    document.getElementById('eventStudio').value = '';
+                    document.getElementById('eventDuration').value = '';
+                    document.getElementById('eventPeople').value = '';
+                    document.getElementById('eventEdit').value = '';
+                    document.getElementById('eventDelivery').value = '';
+
+                    document.getElementById('eventModal').style.display = 'none';
+                    renderCalendar();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar evento:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro ao salvar evento. Verifique o console para mais detalhes.',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                });
+            });
+        });
+
+        // Navegação entre meses
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Exportar eventos para CSV
+        document.getElementById('exportEvents').addEventListener('click', function () {
+            window.location.href = 'exportar-eventos.php';
+        });
+
+        // Fechar modais
+        document.querySelectorAll('.close').forEach(closeButton => {
+            closeButton.addEventListener('click', () => {
+                document.getElementById('eventModal').style.display = 'none';
+                document.getElementById('viewEventModal').style.display = 'none';
+            });
+        });
+
+        // Renderizar o calendário inicialmente
+        renderCalendar();
+    </script>
+</body>
+</html>
