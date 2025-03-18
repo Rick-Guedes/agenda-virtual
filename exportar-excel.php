@@ -1,10 +1,3 @@
-<!-- 
- Autor: Flavio Henrique Guedes Nobre;
- Version: 1.0.1
- "Você é livre para usar e modificar com sabedoria esse código ele é aberto, só não deixe de 
- dar os créditos ao autor"
--->
- 
 <?php
 session_start();
 
@@ -13,10 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'calendario';
+require_once "/config.php";
 
 $conn = new mysqli($host, $user, $password, $database);
 

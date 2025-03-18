@@ -1,8 +1,3 @@
-// Autor: Flavio Henrique Guedes Nobre;
-// Version: 1.0.1
-//"Você é livre para usar e modificar com sabedoria esse código ele é aberto, só não deixe de dar os créditos ao autor"
-
-
 let currentDate = new Date();
 let events = [];
 
@@ -18,29 +13,24 @@ function renderCalendar() {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // Adicionar dias vazios antes do início do mês
     for (let i = 0; i < firstDay; i++) {
         const emptyDay = document.createElement('div');
         emptyDay.className = 'day empty';
         daysContainer.appendChild(emptyDay);
     }
 
-    // Renderizar os dias do mês
     for (let day = 1; day <= daysInMonth; day++) {
         const dayElement = document.createElement('div');
         dayElement.className = 'day';
         dayElement.innerHTML = `<span>${day}</span>`;
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         
-        // Adicionar evento de clique para abrir o modal de cadastro em qualquer dia
         dayElement.addEventListener('click', (e) => {
-            // Verificar se o clique não foi no "Eventos Cadastrados"
             if (!e.target.classList.contains('event')) {
                 openModal(dateStr);
             }
         });
         
-        // Verificar se há eventos no dia
         const dayEvents = events.filter(event => event.data === dateStr);
         if (dayEvents.length > 0) {
             const eventsText = document.createElement('div');
@@ -55,13 +45,12 @@ function renderCalendar() {
 }
 
 function showEventList(date, dayEvents) {
-    let eventList = '<h2>Eventos do Dia</h2>'; // Título único no topo
+    let eventList = '<h2>Eventos do Dia</h2>';
     dayEvents.forEach((event, index) => {
         eventList += `<div class="event-detail">${event.titulo} - ${event.horario.slice(0, 5)}</div>`;
-        // Adicionar linha apenas entre eventos, não após o último
-        /*if (index < dayEvents.length - 1) {
+        if (index < dayEvents.length - 1) {
             eventList += '<hr>';
-        }*/
+        }
     });
 
     Swal.fire({
@@ -70,7 +59,7 @@ function showEventList(date, dayEvents) {
         showCloseButton: true,
         showConfirmButton: true,
         confirmButtonText: 'OK',
-        confirmButtonColor: '#4CAF50', // Cor verde como na imagem
+        confirmButtonColor: '#4CAF50',
         focusConfirm: false,
         customClass: {
             popup: 'event-list-modal',
@@ -124,8 +113,8 @@ document.getElementById('eventForm').addEventListener('submit', (e) => {
         } else {
             Swal.fire('Sucesso', result.message, 'success');
             document.getElementById('eventModal').style.display = 'none';
-            e.target.reset(); // Limpa o formulário
-            fetchEvents(); // Atualiza os eventos no calendário
+            e.target.reset();
+            fetchEvents();
         }
     })
     .catch(error => {
@@ -134,20 +123,29 @@ document.getElementById('eventForm').addEventListener('submit', (e) => {
 });
 
 function fetchEvents() {
-    fetch('listar-eventos.php')
+    fetch('./listar-eventos.php')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Erro na requisição: ' + response.status);
+                throw new Error('Erro na requisição: Status ' + response.status);
             }
-            return response.json();
+            return response.text(); // Captura a resposta bruta como texto
         })
-        .then(data => {
-            if (Array.isArray(data)) {
-                events = data;
-                renderCalendar();
-            } else {
-                console.error('Dados recebidos não são um array:', data);
-                Swal.fire('Erro', 'Erro ao carregar eventos: formato inválido', 'error');
+        .then(text => {
+            console.log('Resposta bruta do listar-eventos.php:', text); // Log da resposta bruta
+            // Tentar remover qualquer conteúdo antes do JSON (ex.: comentários)
+            const jsonStart = text.indexOf('[');
+            const cleanText = jsonStart >= 0 ? text.substring(jsonStart) : text;
+            try {
+                const data = JSON.parse(cleanText);
+                if (Array.isArray(data)) {
+                    events = data;
+                    renderCalendar();
+                } else {
+                    throw new Error('Dados não são um array');
+                }
+            } catch (error) {
+                console.error('Erro ao parsear JSON:', error, 'Texto limpo:', cleanText);
+                Swal.fire('Erro', 'Erro ao carregar eventos: Formato inválido ou servidor retornou HTML', 'error');
             }
         })
         .catch(error => {

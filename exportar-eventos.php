@@ -1,16 +1,6 @@
-<!-- 
- Autor: Flavio Henrique Guedes Nobre;
- Version: 1.0.1
- "Você é livre para usar e modificar com sabedoria esse código ele é aberto, só não deixe de 
- dar os créditos ao autor"
--->
- 
 <?php
 // Configurações do banco de dados
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'calendario';
+require_once "/config.php";
 
 // Conectar ao banco de dados
 $conn = new mysqli($host, $user, $password, $database);

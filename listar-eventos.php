@@ -1,19 +1,14 @@
-<!-- 
- Autor: Flavio Henrique Guedes Nobre;
- Version: 1.0.1
- "Você é livre para usar e modificar com sabedoria esse código ele é aberto, só não deixe de 
- dar os créditos ao autor"
--->
- 
 <?php
-// Define o tipo de conteúdo como JSON
+// Configurações de depuração (remover em produção)
+ini_set('display_errors', 0); // Desativar exibição de erros em produção
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL & ~E_NOTICE); // Mostrar erros, mas não notices
+
+// Definir o tipo de conteúdo como JSON (sem saída antes disso)
 header('Content-Type: application/json');
 
 // Configurações do banco de dados
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'calendario';
+require_once "/config.php";
 
 // Conectar ao banco de dados
 $conn = new mysqli($host, $user, $password, $database);
@@ -39,15 +34,16 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $eventos[] = [
             'id' => $row['id'],
-            'data' => $row['data'],          // Formato: "YYYY-MM-DD"
+            'data' => $row['data'],
             'titulo' => $row['titulo'],
-            'horario' => $row['horario']     // Formato: "HH:MM:SS"
+            'horario' => $row['horario']
         ];
     }
+} else {
+    echo json_encode([]); // Retornar array vazio se não houver eventos
 }
 
-// Retornar os eventos como JSON
-echo json_encode($eventos);
-
+// Fechar conexão e retornar JSON
 $conn->close();
+echo json_encode($eventos);
 ?>
