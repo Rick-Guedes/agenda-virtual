@@ -6,6 +6,7 @@
 -->
  
 <?php
+// Define o tipo de conteúdo como JSON
 header('Content-Type: application/json');
 
 // Configurações do banco de dados
@@ -19,12 +20,18 @@ $conn = new mysqli($host, $user, $password, $database);
 
 // Verificar conexão
 if ($conn->connect_error) {
-    die(json_encode(['error' => 'Erro ao conectar ao banco de dados: ' . $conn->connect_error]));
+    echo json_encode(['error' => 'Erro ao conectar ao banco de dados: ' . $conn->connect_error]);
+    exit;
 }
 
 // Buscar todos os eventos
 $query = "SELECT id, data, titulo, horario FROM eventos";
 $result = $conn->query($query);
+
+if ($result === false) {
+    echo json_encode(['error' => 'Erro na consulta SQL: ' . $conn->error]);
+    exit;
+}
 
 $eventos = [];
 
